@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chaos Keyboard Battle Game 🎮</title>
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-bg: #111;
+      --secondary-bg: #333;
+      --accent-light: #4A90E2;
+      --accent-dark: #003366;
+      --text-color: #fff;
+      --overlay-bg: rgba(0, 0, 0, 0.85);
+      --btn-blue: #007bff;
+      --btn-gold: #ffc107;
+      --btn-shadow: rgba(0, 0, 0, 0.3);
+    }
+    
+    * {
+      box-sizing: border-box;
+    }
+    
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(45deg, var(--primary-bg), var(--secondary-bg));
+      font-family: 'Roboto', sans-serif;
+      color: var(--text-color);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    
+    h1, h2, p {
+      margin: 10px;
+    }
+    
+    /* Rainbow animated title */
+    .rainbow-title {
+      display: inline-block;
+      padding: 15px 30px;
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: var(--text-color);
+      border: 5px solid;
+      border-image: linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet) 1;
+      animation: rainbow 4s linear infinite;
+      margin-bottom: 20px;
+      text-shadow: 0 0 10px rgba(255,255,255,0.5);
+    }
+    @keyframes rainbow {
+      0% { border-image-source: linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet); }
+      50% { border-image-source: linear-gradient(45deg, violet, indigo, blue, green, yellow, orange, red); }
+      100% { border-image-source: linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet); }
+    }
+    
+    /* Canvas styling */
+    canvas {
+      background: #222;
+      border: 2px solid var(--text-color);
+      box-shadow: 0 0 20px rgba(255,255,255,0.2);
+      margin: 20px auto;
+      display: block;
+      border-radius: 10px;
+    }
+    
+    /* Overlays */
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--overlay-bg);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+      animation: fadeIn 0.5s ease-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .overlay.hidden {
+      display: none;
+    }
+    
+    /* Mode buttons */
+    .mode-buttons {
+      margin: 20px 0;
+      display: flex;
+      gap: 15px;
+    }
+    .mode-button {
+      padding: 12px 24px;
+      font-size: 1.1rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.3s;
+      box-shadow: 0 4px 8px var(--btn-shadow);
+    }
+    .duo-button {
+      background: var(--btn-blue);
+      color: var(--text-color);
+    }
+    .solo-button {
+      background: var(--btn-gold);
+      color: #111;
+    }
+    .mode-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px var(--btn-shadow);
+    }
+    
+    /* Name input container */
+    .name-container {
+      margin: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+    }
+    .name-container input {
+      padding: 10px 20px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 5px;
+      background: #444;
+      color: var(--text-color);
+      transition: background 0.3s;
+    }
+    .name-container input:hover {
+      background: #666;
+    }
+    .name-container input:disabled {
+      background: #222;
+      color: #aaa;
+    }
+    
+    /* Button container styling */
+    .button-container {
+      margin: 20px 0;
+    }
+    .button-container button {
+      padding: 12px 24px;
+      font-size: 1.1rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      background: linear-gradient(45deg, #555, #333);
+      color: var(--text-color);
+      transition: background 0.3s, transform 0.2s;
+      box-shadow: 0 4px 8px var(--btn-shadow);
+    }
+    .button-container button:hover {
+      background: linear-gradient(45deg, #666, #444);
+      transform: translateY(-2px);
+    }
+    
+    /* Control Buttons Container */
+    .control-container {
+      margin: 20px auto;
+      width: 90%;
+      max-width: 800px;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .control-container button {
+      padding: 10px 20px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      background: linear-gradient(45deg, #555, #333);
+      color: var(--text-color);
+      transition: background 0.3s, transform 0.2s;
+      box-shadow: 0 4px 8px var(--btn-shadow);
+    }
+    .control-container button:hover {
+      background: linear-gradient(45deg, #666, #444);
+      transform: translateY(-2px);
+    }
+    
+    /* Volume slider */
+    #volumeContainer {
+      margin: 20px auto;
+      text-align: center;
+    }
+    #volumeSlider {
+      width: 300px;
+    }
+    
+    /* Responsive canvas */
+    @media (max-width: 1300px) {
+      canvas {
+        width: 90%;
+        height: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Start Screen Overlay -->
+  <div id="startScreen" class="overlay">
+    <div class="rainbow-title">Chaos Keyboard Battle Game 🎮</div>
+    <div class="mode-buttons">
+      <button id="duoButton" class="mode-button duo-button">Duo Mode</button>
+      <button id="soloButton" class="mode-button solo-button">Solo Mode</button>
+    </div>
+    <div class="name-container">
+      <input type="text" id="p1Name" placeholder="Enter 🟦 Player 1 Name">
+      <input type="text" id="p2Name" placeholder="Enter 🟥 Player 2 Name">
+    </div>
+    <div class="button-container">
+      <button onclick="startGame()">Start Game</button>
+    </div>
+  </div>
+  
+  <!-- Pause Screen Overlay -->
+  <div id="pauseScreen" class="overlay hidden">
+    <h1>Game Paused</h1>
+    <div class="button-container">
+      <button onclick="togglePause()">Resume</button>
+    </div>
+  </div>
+  
+  <!-- Game Over Overlay -->
+  <div id="gameOverScreen" class="overlay hidden">
+    <h1 id="winnerText">Game Over</h1>
+    <div class="button-container">
+      <button onclick="restartGame()">Restart Game</button>
+    </div>
+  </div>
+  
+  <!-- Game Canvas -->
+  <canvas id="gameCanvas" width="1200" height="600"></canvas>
+  
+  <!-- Control Buttons Container -->
+  <div id="controlsContainer" class="control-container">
+    <button onclick="toggleFullScreen()">Full Screen</button>
+    <button onclick="togglePause()">Pause</button>
+    <button onclick="restartGame()">Restart</button>
+    <button onclick="playAgain()">Play Again!</button>
+  </div>
+  
+  <!-- Volume Slider Container -->
+  <div id="volumeContainer">
+    <label for="volumeSlider" style="font-size: 1rem;">Volume:</label>
+    <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.5">
+  </div>
+  
+  <!-- Audio Elements -->
+  <audio id="bgMusic" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" loop></audio>
+  <audio id="shootSound" src="https://actions.google.com/sounds/v1/impulse/camera_shutter_click.ogg"></audio>
+  <audio id="hitSound" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"></audio>
+  <audio id="shieldBreakSound" src="https://actions.google.com/sounds/v1/impulse/metal_hit.ogg"></audio>
+  
+  <!-- Link to external JavaScript file -->
+  <script src="game.js"></script>
+</body>
+  </html>
